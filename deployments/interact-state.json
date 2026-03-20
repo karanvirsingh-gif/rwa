@@ -1,0 +1,15 @@
+{
+  "CountryModule": "0x0ec891dd92A1fa0caee4cccE6a3FD386C527DC44",
+  "TokenAddress": "0xEA666A01880D529089e146dda6AFD0924aaf24Bf",
+  "IRAddress": "0x192738Fb0FF12Aa5564FAF18dEa315ccdF5A98ec",
+  "VaultAddress": "0xB6d427240eCfA43993ABf85EB1e797D85Fcfab8C",
+  "RegistryLinked": "true",
+  "ID_Vault": "0x24581FB4F28435dC2f400a3c290bf71a5d467BD1",
+  "ID_Marketplace": "0xD6E9089959ADac38D0aB2C4941D9FE1373A1e5d3",
+  "ID_Alice": "0x23d76b684d44d82272a0291A0eae847d8D788592",
+  "TrustedIssuerSet": "true",
+  "TokensMinted": "true",
+  "ComplianceBound": "true",
+  "MarketplaceFunded": "true",
+  "PurchaseComplete": "true"
+}
