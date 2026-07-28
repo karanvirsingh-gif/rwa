@@ -14,6 +14,11 @@ const config: HardhatUserConfig = {
         enabled: true,
         runs: 200,
       },
+      // AssetFactory.createAsset() orchestrates 6+ sub-deployments and exceeds the
+      // legacy codegen's stack-depth limit. viaIR only changes how solc generates
+      // bytecode (Yul IR pipeline), not contract behavior - standard for factory-
+      // style orchestration contracts.
+      viaIR: true,
     },
   },
   gasReporter: {
@@ -27,7 +32,7 @@ const config: HardhatUserConfig = {
   },
   networks: {
     polygon: {
-      url: "https://polygon-amoy.drpc.org",
+      url: "https://polygon-amoy-bor-rpc.publicnode.com",
       chainId: 80002,
       accounts: ["ee5546801e07c46c5e4ecb282cae4e3f21389a5e97f4e41490185a5bcba6a1e2", "75de06ff2f872882ad3a4eef81b21fb348453d6b018abc96b865674da5bcfa72"],
       gasPrice: 20000000000, // 20 Gwei (higher base)

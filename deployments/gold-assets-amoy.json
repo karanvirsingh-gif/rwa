@@ -1,0 +1,13 @@
+{
+  "GOLD-BAR-002": {
+    "assetId": "0x3413891eea0161abe480f3978bbb5aaa9eddc70dc6032593a70f908e529b099f",
+    "token": "0xE0fcC098eb7dC34De308630566AD4270188Ee6e4",
+    "vault": "0xCBDa6Dc809Db2ab9dF3448b79b2b873e9192BEF9",
+    "treasury": "0x9e6182B481fa1d61346B1F923883AF60BaB75F78",
+    "distributor": "0xE5b595A40D30804D5d4F771c30DAb4375B838928",
+    "compliance": "0x9fa6aa56370bAeF881235f038e78A3C211f69fC5",
+    "allowedCountry": 42,
+    "maxBalanceGrams": "200",
+    "minPurchaseGrams": "1"
+  }
+}
