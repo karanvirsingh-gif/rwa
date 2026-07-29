@@ -242,4 +242,54 @@ describe('Private Credit - Generalized Architecture Flow', function () {
     const bobTokenBal = await token.balanceOf(bob.address);
     expect(bobTokenBal).to.equal(ethers.utils.parseUnits('5100', 6)); // 5000 + 100
   });
+
+  describe('Lifecycle Edge Cases & State Machine Enforcement', function () {
+    let refundToken: any, defaultToken: any, matureToken: any;
+    let refundCompliance: string, defaultCompliance: string, matureCompliance: string;
+    
+    before(async function () {
+      const PRIVATE_CREDIT = ethers.utils.formatBytes32String('PRIVATE_CREDIT');
+      const td = { owner: ethers.constants.AddressZero, name: 'T1', symbol: 'T1', decimals: 6, irs: ethers.constants.AddressZero, ONCHAINID: ethers.constants.AddressZero, irAgents: [tokenAgent.address], tokenAgents: [tokenAgent.address], complianceModules: [], complianceSettings: [] };
+      const cd = { claimTopics: [claimTopic], issuers: [claimIssuerContract.address], issuerClaims: [[claimTopic]] };
+
+      const createLoan = async (salt: string) => {
+        const tx = await assetFactory.connect(deployer).createAsset({ salt, assetType: PRIVATE_CREDIT, paymentToken: usdc.address, mode: 0, price: 1000000, charityWallet: ethers.constants.AddressZero, admin: deployer.address, metadataURI: 'ipfs://' }, td, cd);
+        const receipt = await tx.wait();
+        const ev = receipt.events?.find((e: any) => e.event === 'AssetCreated');
+        const t = await ethers.getContractAt('Token', ev.args[2]);
+        await stateModule.connect(deployer).initializeLoan(t.address, ethers.utils.parseUnits('1000', 6), 9999999999, 9999999999, 30, 850, ethers.utils.keccak256(ethers.utils.toUtf8Bytes("H")), borrower.address);
+        return { token: t, compliance: await t.compliance() };
+      };
+
+      const r1 = await createLoan('REFUND-001'); refundToken = r1.token; refundCompliance = r1.compliance;
+      const r2 = await createLoan('DEFAULT-001'); defaultToken = r2.token; defaultCompliance = r2.compliance;
+      const r3 = await createLoan('MATURE-001'); matureToken = r3.token; matureCompliance = r3.compliance;
+    });
+
+    it('REFUND State: Blocks P2P, Blocks Minting, Allows Burning', async function () {
+      await stateModule.connect(deployer).transitionToRefund(refundToken.address);
+      
+      expect(await stateModule.moduleCheck(alice.address, bob.address, 100, refundCompliance)).to.be.false;
+      expect(await stateModule.moduleCheck(ethers.constants.AddressZero, bob.address, 100, refundCompliance)).to.be.false;
+      expect(await stateModule.moduleCheck(alice.address, ethers.constants.AddressZero, 100, refundCompliance)).to.be.true;
+    });
+
+    it('DEFAULTED State: Instantly freezes all token movement globally', async function () {
+      await stateModule.connect(deployer).transitionToActive(defaultToken.address);
+      await stateModule.connect(deployer).transitionToDefaulted(defaultToken.address);
+
+      expect(await stateModule.moduleCheck(alice.address, bob.address, 100, defaultCompliance)).to.be.false; 
+      expect(await stateModule.moduleCheck(ethers.constants.AddressZero, bob.address, 100, defaultCompliance)).to.be.false; 
+      expect(await stateModule.moduleCheck(alice.address, ethers.constants.AddressZero, 100, defaultCompliance)).to.be.false; 
+    });
+
+    it('MATURED State: Blocks P2P, Allows Burning for Principal Redemption', async function () {
+      await stateModule.connect(deployer).transitionToActive(matureToken.address);
+      await stateModule.connect(deployer).transitionToMatured(matureToken.address);
+
+      expect(await stateModule.moduleCheck(alice.address, bob.address, 100, matureCompliance)).to.be.false; 
+      expect(await stateModule.moduleCheck(ethers.constants.AddressZero, bob.address, 100, matureCompliance)).to.be.false; 
+      expect(await stateModule.moduleCheck(alice.address, ethers.constants.AddressZero, 100, matureCompliance)).to.be.true; 
+    });
+  });
 });
