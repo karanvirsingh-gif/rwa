@@ -23,6 +23,7 @@ contract AssetTreasury is Initializable, AccessControlUpgradeable, ReentrancyGua
     uint256 public totalReceived;
 
     event FundsReceived(address indexed from, uint256 amount);
+    event FundsDeposited(address indexed from, uint256 amount, string reason);
     event FundsReleased(address indexed to, uint256 amount, string reason);
 
     /// @custom:oz-upgrades-unsafe-allow constructor
@@ -47,6 +48,18 @@ contract AssetTreasury is Initializable, AccessControlUpgradeable, ReentrancyGua
     function receiveFunds(uint256 amount) external onlyRole(VAULT_ROLE) {
         totalReceived += amount;
         emit FundsReceived(msg.sender, amount);
+    }
+
+    /**
+     * @dev Allows anyone (e.g., a borrower repaying principal, or a sponsor injecting capital) 
+     * to securely deposit funds into the treasury. Emits an event for backend accounting.
+     */
+    function deposit(uint256 amount, string calldata reason) external nonReentrant {
+        require(amount > 0, "amount must be greater than 0");
+        require(paymentToken.transferFrom(msg.sender, address(this), amount), "deposit failed");
+        
+        totalReceived += amount;
+        emit FundsDeposited(msg.sender, amount, reason);
     }
 
     /**
