@@ -29,5 +29,8 @@
   "GoldAssetTypeRegistered": "true",
   "CountryAllowModule": "0x859CdaAc6203caBd884a2bA3c62df3117a3CcdA4",
   "MaxBalanceModule": "0x49aBB8cF52b55E4054F3D5B7faC846cde7168Ed4",
-  "MinimumInvestmentModule": "0xb18a37403858ac4AfB8Cd05e9E31074633Cd09a3"
+  "MinimumInvestmentModule": "0xb18a37403858ac4AfB8Cd05e9E31074633Cd09a3",
+  "CustodianAttestationModule": "0x639A57092b115BB4Db2bd6D048cbe985D40b4692",
+  "CollectibleLockPeriodModule": "0x55621FC5201D36db3Ebb0EE4D1C0D9D9fa2e6637",
+  "CollectiblesAssetTypeRegistered": "true"
 }
