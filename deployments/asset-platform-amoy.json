@@ -29,5 +29,6 @@
   "GoldAssetTypeRegistered": "true",
   "CountryAllowModule": "0x859CdaAc6203caBd884a2bA3c62df3117a3CcdA4",
   "MaxBalanceModule": "0x49aBB8cF52b55E4054F3D5B7faC846cde7168Ed4",
-  "MinimumInvestmentModule": "0xb18a37403858ac4AfB8Cd05e9E31074633Cd09a3"
+  "MinimumInvestmentModule": "0xb18a37403858ac4AfB8Cd05e9E31074633Cd09a3",
+  "MusicAssetTypeRegistered": "true"
 }
