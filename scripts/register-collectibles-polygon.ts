@@ -5,7 +5,7 @@ import * as path from 'path';
 /**
  * ONE-TIME SETUP SCRIPT for Collectibles.
  * 
- * This script only deploys the CustodianAttestationModule and CollectibleLockPeriodModule,
+ * This script only deploys the CustodianAttestationModule and SupplyLimitModule,
  * and registers the "COLLECTIBLES" asset type with the global AssetFactory. 
  * 
  * Run this once. After this, your backend team takes over to dynamically create 
@@ -45,7 +45,7 @@ async function main() {
   const COLLECTIBLES = ethers.utils.formatBytes32String('COLLECTIBLES');
 
   let custodianAddress = platform.CustodianAttestationModule;
-  let lockPeriodAddress = platform.CollectibleLockPeriodModule;
+  let supplyLimitAddress = platform.SupplyLimitModule;
 
   if (!custodianAddress) {
     console.log('\n1. Deploying CustodianAttestationModule...');
@@ -59,16 +59,16 @@ async function main() {
     console.log('\n✓ CustodianAttestationModule is already deployed at:', custodianAddress);
   }
 
-  if (!lockPeriodAddress) {
-    console.log('\n2. Deploying CollectibleLockPeriodModule...');
-    const LockFactory = await ethers.getContractFactory('CollectibleLockPeriodModule');
-    const lockPeriod = await LockFactory.deploy({ gasPrice });
-    await lockPeriod.deployed();
-    lockPeriodAddress = lockPeriod.address;
-    savePlatformAddress('CollectibleLockPeriodModule', lockPeriodAddress);
-    console.log('  ✓ Deployed at:', lockPeriodAddress);
+  if (!supplyLimitAddress) {
+    console.log('\n2. Deploying SupplyLimitModule...');
+    const SupplyLimitFactory = await ethers.getContractFactory('SupplyLimitModule');
+    const supplyLimit = await SupplyLimitFactory.deploy({ gasPrice });
+    await supplyLimit.deployed();
+    supplyLimitAddress = supplyLimit.address;
+    savePlatformAddress('SupplyLimitModule', supplyLimitAddress);
+    console.log('  ✓ Deployed at:', supplyLimitAddress);
   } else {
-    console.log('\n✓ CollectibleLockPeriodModule is already deployed at:', lockPeriodAddress);
+    console.log('\n✓ SupplyLimitModule is already deployed at:', supplyLimitAddress);
   }
 
   const isRegistered = platform.CollectiblesAssetTypeRegistered;
@@ -76,7 +76,7 @@ async function main() {
     console.log('\n3. Registering COLLECTIBLES asset type on the Factory...');
     const tx = await assetFactory.connect(deployer).registerAssetType(
       COLLECTIBLES, 
-      [custodianAddress, lockPeriodAddress], 
+      [custodianAddress, supplyLimitAddress], 
       { gasPrice }
     );
     await tx.wait();
@@ -91,7 +91,7 @@ async function main() {
   console.log('You must provide the following to your BACKEND team:');
   console.log('1. AssetFactory Address:      ', platform.AssetFactory);
   console.log('2. Custodian Module Address:  ', custodianAddress);
-  console.log('3. Lock Period Module Address:', lockPeriodAddress);
+  console.log('3. Supply Limit Module Address:', supplyLimitAddress);
   console.log('4. Asset Type String:          "COLLECTIBLES"');
   console.log('\nWhen a user submits a form, the backend will use the Factory');
   console.log('to create the asset, and the modules to initialize the rules.');
