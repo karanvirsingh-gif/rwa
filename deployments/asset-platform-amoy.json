@@ -31,5 +31,7 @@
   "MaxBalanceModule": "0x49aBB8cF52b55E4054F3D5B7faC846cde7168Ed4",
   "MinimumInvestmentModule": "0xb18a37403858ac4AfB8Cd05e9E31074633Cd09a3",
   "PrivateCreditStateModule": "0x1a0f0F6dCaE9cce08C64d5945DB551D68aAaB7B4",
-  "PrivateCreditAssetTypeRegistered": "true"
+  "PrivateCreditAssetTypeRegistered": "true",
+  "SupplyLimitModule": "0x8f476bb91026Fb66a0B71656089c85984CA18B8A",
+  "PrivateCreditAssetTypeRegisteredV2": "true"
 }

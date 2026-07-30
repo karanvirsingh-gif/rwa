@@ -55,15 +55,33 @@ async function main() {
     stateModuleAddress = stateModule.address;
     savePlatformAddress('PrivateCreditStateModule', stateModuleAddress);
     console.log('  ✓ Deployed at:', stateModuleAddress);
-
-    console.log('\n2. Registering PRIVATE_CREDIT asset type on the Factory...');
-    const tx = await assetFactory.connect(deployer).registerAssetType(PRIVATE_CREDIT, [stateModuleAddress], { gasPrice });
-    await tx.wait();
-    savePlatformAddress('PrivateCreditAssetTypeRegistered', 'true');
-    console.log('  ✓ Successfully bound PrivateCreditStateModule to "PRIVATE_CREDIT".');
   } else {
     console.log('\n✓ PrivateCreditStateModule is already deployed at:', stateModuleAddress);
-    console.log('✓ PRIVATE_CREDIT asset type is already registered.');
+  }
+
+  let supplyLimitModuleAddress = platform.SupplyLimitModule;
+
+  if (!supplyLimitModuleAddress) {
+    console.log('\n2. Deploying SupplyLimitModule...');
+    const SupplyLimitModule = await ethers.getContractFactory('SupplyLimitModule');
+    const supplyLimitModule = await SupplyLimitModule.deploy({ gasPrice });
+    await supplyLimitModule.deployed();
+    await (await supplyLimitModule.initialize()).wait();
+    supplyLimitModuleAddress = supplyLimitModule.address;
+    savePlatformAddress('SupplyLimitModule', supplyLimitModuleAddress);
+    console.log('  ✓ Deployed at:', supplyLimitModuleAddress);
+  } else {
+    console.log('\n✓ SupplyLimitModule is already deployed at:', supplyLimitModuleAddress);
+  }
+
+  if (!platform.PrivateCreditAssetTypeRegisteredV2) {
+    console.log('\n3. Registering PRIVATE_CREDIT asset type on the Factory...');
+    const tx = await assetFactory.connect(deployer).registerAssetType(PRIVATE_CREDIT, [stateModuleAddress, supplyLimitModuleAddress], { gasPrice });
+    await tx.wait();
+    savePlatformAddress('PrivateCreditAssetTypeRegisteredV2', 'true');
+    console.log('  ✓ Successfully bound PrivateCreditStateModule and SupplyLimitModule to "PRIVATE_CREDIT".');
+  } else {
+    console.log('✓ PRIVATE_CREDIT asset type is already registered (V2).');
   }
 
   console.log('\n=============================================================');
