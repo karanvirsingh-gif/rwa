@@ -10,6 +10,7 @@ import "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
 import "./ITREXFactory.sol";
 import "../token/Token.sol";
 import "../compliance/modular/IModularCompliance.sol";
+import "../compliance/modular/modules/SupplyLimitModule.sol";
 import "../assets/AssetTreasury.sol";
 import "../assets/AssetVault.sol";
 import "../assets/YieldDistributor.sol";
@@ -54,6 +55,9 @@ contract AssetFactory is Initializable, UUPSUpgradeable, AccessControlUpgradeabl
         address charityWallet;
         address admin;
         string metadataURI;
+        /// @dev Required. The maximum number of tokens that can ever be minted for
+        /// this asset. Enforced on-chain by SupplyLimitModule; reverts if 0.
+        uint256 supplyLimit;
     }
 
     ITREXFactory public trexFactory;
@@ -65,9 +69,16 @@ contract AssetFactory is Initializable, UUPSUpgradeable, AccessControlUpgradeabl
     mapping(bytes32 => AssetTypeConfig) public assetTypes;
     mapping(bytes32 => bool) public assetIdUsed;
 
+    /// @dev Slot 7. The single, platform-wide SupplyLimitModule instance.
+    /// Every asset created by this factory has its supply cap set here atomically
+    /// during createAsset(), before ownership is handed to the admin.
+    /// Appended AFTER all V1 storage - never insert above this line.
+    address public supplyLimitModule;
+
     event AssetTypeRegistered(bytes32 indexed assetType, address[] complianceModules);
     event AssetCreated(bytes32 indexed assetId, bytes32 indexed assetType, address token, address vault, address treasury, address distributor);
     event ImplementationsUpdated(address vaultImpl, address treasuryImpl, address distributorImpl);
+    event SupplyLimitModuleSet(address indexed supplyLimitModule);
 
     /// @custom:oz-upgrades-unsafe-allow constructor
     constructor() {
@@ -95,6 +106,15 @@ contract AssetFactory is Initializable, UUPSUpgradeable, AccessControlUpgradeabl
         _grantRole(GOVERNANCE_ROLE, admin);
         _grantRole(ASSET_ORIGINATOR_ROLE, admin);
         _grantRole(UPGRADER_ROLE, admin);
+    }
+
+    /// @dev Called once via upgradeToAndCall() when upgrading the live proxy to V2.
+    /// Sets the platform-wide SupplyLimitModule address that was already deployed.
+    /// Uses reinitializer(2) so it can never be called again after this upgrade.
+    function initializeV2(address _supplyLimitModule) public reinitializer(2) {
+        require(_supplyLimitModule != address(0), "supply limit module required");
+        supplyLimitModule = _supplyLimitModule;
+        emit SupplyLimitModuleSet(_supplyLimitModule);
     }
 
     // =========================================================================
@@ -129,6 +149,8 @@ contract AssetFactory is Initializable, UUPSUpgradeable, AccessControlUpgradeabl
         ITREXFactory.TokenDetails calldata tokenDetails,
         ITREXFactory.ClaimDetails calldata claimDetails
     ) external onlyRole(ASSET_ORIGINATOR_ROLE) returns (bytes32, address, address, address, address) {
+        require(params.supplyLimit > 0, "supply limit must be greater than zero");
+        require(supplyLimitModule != address(0), "upgrade to V2 first: call initializeV2");
         AssetTypeConfig memory cfg = assetTypes[params.assetType];
         require(cfg.registered, "unknown asset type - call registerAssetType first");
 
@@ -142,7 +164,7 @@ contract AssetFactory is Initializable, UUPSUpgradeable, AccessControlUpgradeabl
         a.vault = _deployVault(a.assetId, a.token, a.treasury, params);
         a.distributor = _deployDistributor(a.assetId, a.token, params);
 
-        _wire(a.token, a.treasury, a.vault, a.distributor, cfg.complianceModules);
+        _wire(a.token, a.treasury, a.vault, a.distributor, cfg.complianceModules, params.supplyLimit);
         _handOver(a.token, a.treasury, a.vault, a.distributor, params.admin);
 
         registry.register(a.assetId, params.assetType, a.token, a.vault, a.treasury, a.distributor, params.metadataURI);
@@ -188,15 +210,35 @@ contract AssetFactory is Initializable, UUPSUpgradeable, AccessControlUpgradeabl
     }
 
     /// @dev Grants the Vault mint/burn rights on the token, binds the yield
-    /// distributor and the asset type's compliance modules, and lets the Vault pull
-    /// funds into its paired Treasury.
-    function _wire(address token, address treasury, address vault, address distributor, address[] memory typeModules) internal {
+    /// distributor, the platform-wide SupplyLimitModule (mandatory for every asset),
+    /// and the asset type's compliance modules. Configures the supply cap atomically
+    /// before handing ownership to the admin - there is no window where the token
+    /// exists with an uncapped supply.
+    function _wire(
+        address token,
+        address treasury,
+        address vault,
+        address distributor,
+        address[] memory typeModules,
+        uint256 supplyLimit
+    ) internal {
         Token(token).addAgent(vault);
 
         AssetTreasury(treasury).grantRole(AssetTreasury(treasury).VAULT_ROLE(), vault);
 
         IModularCompliance compliance = IModularCompliance(address(Token(token).compliance()));
         compliance.addModule(distributor);
+
+        // ── Supply cap (mandatory, platform-level) ────────────────────────────
+        // addModule first, then configure via callModuleFunction because
+        // setSupplyLimit() is guarded by onlyComplianceCall (msg.sender == compliance).
+        compliance.addModule(supplyLimitModule);
+        compliance.callModuleFunction(
+            abi.encodeWithSelector(SupplyLimitModule.setSupplyLimit.selector, supplyLimit),
+            supplyLimitModule
+        );
+
+        // ── Asset-type-specific behavioral modules ────────────────────────────
         for (uint256 i = 0; i < typeModules.length; i++) {
             compliance.addModule(typeModules[i]);
         }
@@ -243,6 +285,15 @@ contract AssetFactory is Initializable, UUPSUpgradeable, AccessControlUpgradeabl
         treasuryImplementation = _treasuryImpl;
         distributorImplementation = _distributorImpl;
         emit ImplementationsUpdated(_vaultImpl, _treasuryImpl, _distributorImpl);
+    }
+
+    /// @dev Allows governance to point the factory at a new SupplyLimitModule
+    /// implementation after an upgrade. Existing assets are unaffected (their
+    /// compliance contracts already hold the old module address).
+    function setSupplyLimitModule(address _supplyLimitModule) external onlyRole(GOVERNANCE_ROLE) {
+        require(_supplyLimitModule != address(0), "zero address");
+        supplyLimitModule = _supplyLimitModule;
+        emit SupplyLimitModuleSet(_supplyLimitModule);
     }
 
     function _authorizeUpgrade(address) internal override onlyRole(UPGRADER_ROLE) {}

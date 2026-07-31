@@ -22,6 +22,7 @@ const LOAN_ASSET_SALT = 'CORP-LOAN-001'; // must be unique
 const TARGET_PRINCIPAL_USDC = '10000'; // Target raise amount
 const COUPON_RATE = 850; // 8.5%
 const INVESTOR_ADDRESS = ''; // real wallet to KYC-verify now; leave blank to skip
+const LOAN_SUPPLY_LIMIT = '10000'; // max tokens that can ever be minted (1 token = 1 USDC principal) — must equal or exceed TARGET_PRINCIPAL_USDC
 
 const ALLOWED_COUNTRY = 42; // ISO 3166-1 numeric - optional compliance
 
@@ -166,6 +167,7 @@ async function main() {
     charityWallet: ethers.constants.AddressZero,
     admin: deployer.address,
     metadataURI: `ipfs://${LOAN_ASSET_SALT.toLowerCase()}-metadata`,
+    supplyLimit: ethers.utils.parseUnits(LOAN_SUPPLY_LIMIT, DECIMALS), // hard cap — SupplyLimitModule enforces this on every mint
   };
 
   console.log('\nCreating asset via AssetFactory...');

@@ -4,12 +4,13 @@ import * as path from 'path';
 
 /**
  * ONE-TIME SETUP SCRIPT for Private Credit.
- * 
- * This script only deploys the PrivateCreditStateModule and registers the 
- * "PRIVATE_CREDIT" asset type with the global AssetFactory. 
- * 
- * Run this once. After this, your backend team takes over to dynamically create 
- * individual loans whenever a user submits a form on the frontend.
+ *
+ * Deploys the PrivateCreditStateModule and registers the "PRIVATE_CREDIT" asset
+ * type with the global AssetFactory.
+ *
+ * NOTE: SupplyLimitModule is NOT registered here. Since AssetFactory V2, it is a
+ * mandatory platform-level module wired automatically in every createAsset() call.
+ * The backend must pass "supplyLimit" (uint256) when calling createAsset().
  *
  * Run: npx hardhat run scripts/register-private-credit-type-amoy.ts --network polygon
  */
@@ -46,6 +47,7 @@ async function main() {
   const assetFactory = await ethers.getContractAt('AssetFactory', platform.AssetFactory);
   const PRIVATE_CREDIT = ethers.utils.formatBytes32String('PRIVATE_CREDIT');
 
+  // ── Step 1: PrivateCreditStateModule (type-specific, deployed once) ─────────
   let stateModuleAddress = platform.PrivateCreditStateModule;
 
   if (!stateModuleAddress) {
@@ -56,42 +58,31 @@ async function main() {
     savePlatformAddress('PrivateCreditStateModule', stateModuleAddress);
     console.log('  ✓ Deployed at:', stateModuleAddress);
   } else {
-    console.log('\n✓ PrivateCreditStateModule is already deployed at:', stateModuleAddress);
+    console.log('\n✓ PrivateCreditStateModule already deployed at:', stateModuleAddress);
   }
 
-  let supplyLimitModuleAddress = platform.SupplyLimitModule;
-
-  if (!supplyLimitModuleAddress) {
-    console.log('\n2. Deploying SupplyLimitModule...');
-    const SupplyLimitModule = await ethers.getContractFactory('SupplyLimitModule');
-    const supplyLimitModule = await SupplyLimitModule.deploy({ gasPrice });
-    await supplyLimitModule.deployed();
-    await (await supplyLimitModule.initialize()).wait();
-    supplyLimitModuleAddress = supplyLimitModule.address;
-    savePlatformAddress('SupplyLimitModule', supplyLimitModuleAddress);
-    console.log('  ✓ Deployed at:', supplyLimitModuleAddress);
-  } else {
-    console.log('\n✓ SupplyLimitModule is already deployed at:', supplyLimitModuleAddress);
-  }
-
+  // ── Step 2: Register asset type with only type-specific modules ──────────────
+  // SupplyLimitModule is intentionally omitted — the factory adds it automatically
+  // on every createAsset() call since V2. Adding it here too would cause a
+  // duplicate addModule() revert.
   if (!platform.PrivateCreditAssetTypeRegisteredV2) {
-    console.log('\n3. Registering PRIVATE_CREDIT asset type on the Factory...');
-    const tx = await assetFactory.connect(deployer).registerAssetType(PRIVATE_CREDIT, [stateModuleAddress, supplyLimitModuleAddress], { gasPrice });
+    console.log('\n2. Registering PRIVATE_CREDIT asset type on the Factory...');
+    const tx = await assetFactory.connect(deployer).registerAssetType(PRIVATE_CREDIT, [stateModuleAddress], { gasPrice });
     await tx.wait();
     savePlatformAddress('PrivateCreditAssetTypeRegisteredV2', 'true');
-    console.log('  ✓ Successfully bound PrivateCreditStateModule and SupplyLimitModule to "PRIVATE_CREDIT".');
+    console.log('  ✓ PRIVATE_CREDIT registered with PrivateCreditStateModule.');
   } else {
-    console.log('✓ PRIVATE_CREDIT asset type is already registered (V2).');
+    console.log('✓ PRIVATE_CREDIT asset type is already registered.');
   }
 
   console.log('\n=============================================================');
   console.log('🚀 SETUP COMPLETE!');
   console.log('You must provide the following to your BACKEND team:');
-  console.log('1. AssetFactory Address:      ', platform.AssetFactory);
-  console.log('2. StateModule Address:       ', stateModuleAddress);
-  console.log('3. Asset Type String:          "PRIVATE_CREDIT"');
-  console.log('\nWhen a borrower submits a form, the backend will use the Factory');
-  console.log('to create the asset, and the StateModule to initialize the loan.');
+  console.log('1. AssetFactory Address:  ', platform.AssetFactory);
+  console.log('2. StateModule Address:   ', stateModuleAddress);
+  console.log('3. Asset Type String:      "PRIVATE_CREDIT"');
+  console.log('\nNOTE: SupplyLimitModule is now wired automatically by AssetFactory V2.');
+  console.log('Backend must pass "supplyLimit" (uint256) in every createAsset() call.');
   console.log('=============================================================');
 }
 
