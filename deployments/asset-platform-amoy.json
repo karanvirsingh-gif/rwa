@@ -33,5 +33,6 @@
   "PrivateCreditStateModule": "0x1a0f0F6dCaE9cce08C64d5945DB551D68aAaB7B4",
   "PrivateCreditAssetTypeRegistered": "true",
   "SupplyLimitModule": "0x8f476bb91026Fb66a0B71656089c85984CA18B8A",
-  "PrivateCreditAssetTypeRegisteredV2": "true"
+  "PrivateCreditAssetTypeRegisteredV2": "true",
+  "MusicAssetTypeRegistered": "true"
 }
