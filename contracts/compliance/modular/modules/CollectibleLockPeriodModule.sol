@@ -29,9 +29,17 @@ contract CollectibleLockPeriodModule is AbstractModuleUpgradeable {
         uint256 expiresAt;
     }
 
-    // Maps a specific Collectible's Compliance contract to a User's wallet, which stores an array of their active locks.
-    // Think of it as: Collectible => Investor Wallet => [Lock 1, Lock 2]
-    mapping(address => mapping(address => Lock[])) public userLocks;
+    struct QueueInfo {
+        uint128 head;
+        uint128 tail;
+    }
+    
+    // Maps a specific Collectible's Compliance contract to a User's wallet, which stores their lock queue.
+    // Think of it as: Collectible => Investor Wallet => Queue Details
+    mapping(address => mapping(address => QueueInfo)) public userQueueInfo;
+    
+    // Maps Compliance => User => Queue Index => Lock details
+    mapping(address => mapping(address => mapping(uint256 => Lock))) public userLocks;
 
     event LockDurationSet(address indexed compliance, uint256 duration);
     event LockApplied(address indexed compliance, address indexed user, uint256 amount, uint256 lockEndsAt);
@@ -69,11 +77,12 @@ contract CollectibleLockPeriodModule is AbstractModuleUpgradeable {
         }
 
         uint256 lockedSum = 0;
-        Lock[] memory locks = userLocks[_compliance][_from];
+        QueueInfo memory info = userQueueInfo[_compliance][_from];
         
-        for (uint i = 0; i < locks.length; i++) {
-            if (locks[i].expiresAt > block.timestamp) {
-                lockedSum += locks[i].amount;
+        for (uint256 i = info.head; i < info.tail; i++) {
+            Lock memory lock = userLocks[_compliance][_from][i];
+            if (lock.expiresAt > block.timestamp) {
+                lockedSum += lock.amount;
             }
         }
 
@@ -93,7 +102,11 @@ contract CollectibleLockPeriodModule is AbstractModuleUpgradeable {
 
     /// @dev Hook called after a secondary market trade. 
     /// Secondary market buyers DO NOT receive a new lock. 
-    function moduleTransferAction(address /* _from */, address /* _to */, uint256 /* _value */) external override onlyComplianceCall {}
+    function moduleTransferAction(address _from, address /* _to */, uint256 /* _value */) external override onlyComplianceCall {
+        if (_from != address(0)) {
+            _cleanExpiredLocks(msg.sender, _from);
+        }
+    }
 
     /// @dev Hook called after a primary market purchase. Applies the lock to the initial buyer.
     function moduleMintAction(address _to, uint256 _value) external override onlyComplianceCall {
@@ -113,11 +126,43 @@ contract CollectibleLockPeriodModule is AbstractModuleUpgradeable {
         // If duration is 0, no lock applies to this asset
         if (duration > 0) {
             uint256 endsAt = block.timestamp + duration;
-            userLocks[compliance][user].push(Lock({
+            QueueInfo storage info = userQueueInfo[compliance][user];
+            uint256 currentIndex = info.tail;
+            
+            userLocks[compliance][user][currentIndex] = Lock({
                 amount: amount,
                 expiresAt: endsAt
-            }));
+            });
+            
+            info.tail = uint128(currentIndex + 1);
             emit LockApplied(compliance, user, amount, endsAt);
+        }
+    }
+
+    /// @dev Public function allowing anyone to trigger a cleanup of their expired locks to save gas.
+    function cleanExpiredLocks(address compliance, address user) external {
+        _cleanExpiredLocks(compliance, user);
+    }
+
+    function _cleanExpiredLocks(address compliance, address user) internal {
+        QueueInfo storage info = userQueueInfo[compliance][user];
+        uint256 currentHead = info.head;
+        uint256 tail = info.tail;
+        
+        while (currentHead < tail) {
+            Lock memory lock = userLocks[compliance][user][currentHead];
+            if (lock.expiresAt <= block.timestamp) {
+                delete userLocks[compliance][user][currentHead];
+                currentHead++;
+            } else {
+                // Since time is linear, if the oldest active lock hasn't expired,
+                // the newer ones definitely haven't expired either.
+                break;
+            }
+        }
+        
+        if (currentHead != info.head) {
+            info.head = uint128(currentHead);
         }
     }
 

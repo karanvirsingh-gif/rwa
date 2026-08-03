@@ -31,7 +31,7 @@
   "MaxBalanceModule": "0x49aBB8cF52b55E4054F3D5B7faC846cde7168Ed4",
   "MinimumInvestmentModule": "0xb18a37403858ac4AfB8Cd05e9E31074633Cd09a3",
   "CustodianAttestationModule": "0x639A57092b115BB4Db2bd6D048cbe985D40b4692",
-  "CollectibleLockPeriodModule": "0x55621FC5201D36db3Ebb0EE4D1C0D9D9fa2e6637",
+  "CollectibleLockPeriodModule": "0xC6D2EF7749d3C157B013a62F1EdFa2ef853Bf507",
   "CollectiblesAssetTypeRegistered": "true",
   "SupplyLimitModule": "0x8f476bb91026Fb66a0B71656089c85984CA18B8A"
 }

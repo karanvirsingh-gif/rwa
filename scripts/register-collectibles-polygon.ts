@@ -75,8 +75,8 @@ async function main() {
   if (!isRegistered) {
     console.log('\n3. Registering COLLECTIBLES asset type on the Factory...');
     const tx = await assetFactory.connect(deployer).registerAssetType(
-      COLLECTIBLES, 
-      [custodianAddress, supplyLimitAddress], 
+      COLLECTIBLES,
+      [custodianAddress, supplyLimitAddress],
       { gasPrice }
     );
     await tx.wait();

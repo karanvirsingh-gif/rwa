@@ -1,0 +1,193 @@
+{
+  "manifestVersion": "3.2",
+  "proxies": [
+    {
+      "address": "0xC6D2EF7749d3C157B013a62F1EdFa2ef853Bf507",
+      "txHash": "0x9870143544b5f99f669582bf33bb46971c21bbf7bd8713ec24785376dee05af8",
+      "kind": "uups"
+    }
+  ],
+  "impls": {
+    "816da8cf38e68abf2f22288d6c3e45e98ae9557a1d1bfd0406ee662612a8b02d": {
+      "address": "0x5582521C3E5F4A438Dcab16A5dc35D1254e955A8",
+      "txHash": "0xf7d7b2c6040c9578738a4072fb0091e6828722ac84b02e0eecdc6bfa341a97c6",
+      "layout": {
+        "solcVersion": "0.8.17",
+        "storage": [
+          {
+            "label": "_initialized",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_uint8",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:63",
+            "retypedFrom": "bool"
+          },
+          {
+            "label": "_initializing",
+            "offset": 1,
+            "slot": "0",
+            "type": "t_bool",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:68"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_array(t_uint256)50_storage",
+            "contract": "ContextUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol:36"
+          },
+          {
+            "label": "_owner",
+            "offset": 0,
+            "slot": "51",
+            "type": "t_address",
+            "contract": "OwnableUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:22"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "52",
+            "type": "t_array(t_uint256)49_storage",
+            "contract": "OwnableUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:94"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "101",
+            "type": "t_array(t_uint256)50_storage",
+            "contract": "ERC1967UpgradeUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/ERC1967/ERC1967UpgradeUpgradeable.sol:169"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "151",
+            "type": "t_array(t_uint256)50_storage",
+            "contract": "UUPSUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol:111"
+          },
+          {
+            "label": "lockDurations",
+            "offset": 0,
+            "slot": "201",
+            "type": "t_mapping(t_address,t_uint256)",
+            "contract": "CollectibleLockPeriodModule",
+            "src": "contracts/compliance/modular/modules/CollectibleLockPeriodModule.sol:25"
+          },
+          {
+            "label": "userQueueInfo",
+            "offset": 0,
+            "slot": "202",
+            "type": "t_mapping(t_address,t_mapping(t_address,t_struct(QueueInfo)2053_storage))",
+            "contract": "CollectibleLockPeriodModule",
+            "src": "contracts/compliance/modular/modules/CollectibleLockPeriodModule.sol:39"
+          },
+          {
+            "label": "userLocks",
+            "offset": 0,
+            "slot": "203",
+            "type": "t_mapping(t_address,t_mapping(t_address,t_mapping(t_uint256,t_struct(Lock)2048_storage)))",
+            "contract": "CollectibleLockPeriodModule",
+            "src": "contracts/compliance/modular/modules/CollectibleLockPeriodModule.sol:42"
+          }
+        ],
+        "types": {
+          "t_address": {
+            "label": "address",
+            "numberOfBytes": "20"
+          },
+          "t_array(t_uint256)49_storage": {
+            "label": "uint256[49]",
+            "numberOfBytes": "1568"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]",
+            "numberOfBytes": "1600"
+          },
+          "t_bool": {
+            "label": "bool",
+            "numberOfBytes": "1"
+          },
+          "t_mapping(t_address,t_mapping(t_address,t_mapping(t_uint256,t_struct(Lock)2048_storage)))": {
+            "label": "mapping(address => mapping(address => mapping(uint256 => struct CollectibleLockPeriodModule.Lock)))",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_address,t_mapping(t_address,t_struct(QueueInfo)2053_storage))": {
+            "label": "mapping(address => mapping(address => struct CollectibleLockPeriodModule.QueueInfo))",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_address,t_mapping(t_uint256,t_struct(Lock)2048_storage))": {
+            "label": "mapping(address => mapping(uint256 => struct CollectibleLockPeriodModule.Lock))",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_address,t_struct(QueueInfo)2053_storage)": {
+            "label": "mapping(address => struct CollectibleLockPeriodModule.QueueInfo)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_address,t_uint256)": {
+            "label": "mapping(address => uint256)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_uint256,t_struct(Lock)2048_storage)": {
+            "label": "mapping(uint256 => struct CollectibleLockPeriodModule.Lock)",
+            "numberOfBytes": "32"
+          },
+          "t_struct(Lock)2048_storage": {
+            "label": "struct CollectibleLockPeriodModule.Lock",
+            "members": [
+              {
+                "label": "amount",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "expiresAt",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "1"
+              }
+            ],
+            "numberOfBytes": "64"
+          },
+          "t_struct(QueueInfo)2053_storage": {
+            "label": "struct CollectibleLockPeriodModule.QueueInfo",
+            "members": [
+              {
+                "label": "head",
+                "type": "t_uint128",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "tail",
+                "type": "t_uint128",
+                "offset": 16,
+                "slot": "0"
+              }
+            ],
+            "numberOfBytes": "32"
+          },
+          "t_uint128": {
+            "label": "uint128",
+            "numberOfBytes": "16"
+          },
+          "t_uint256": {
+            "label": "uint256",
+            "numberOfBytes": "32"
+          },
+          "t_uint8": {
+            "label": "uint8",
+            "numberOfBytes": "1"
+          }
+        },
+        "namespaces": {}
+      }
+    }
+  }
+}
