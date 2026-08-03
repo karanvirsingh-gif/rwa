@@ -34,5 +34,6 @@
   "PrivateCreditAssetTypeRegistered": "true",
   "SupplyLimitModule": "0x8f476bb91026Fb66a0B71656089c85984CA18B8A",
   "PrivateCreditAssetTypeRegisteredV2": "true",
-  "MusicAssetTypeRegistered": "true"
+  "MusicAssetTypeRegistered": "true",
+  "GoldAssetTypeRegisteredWithSupplyLimit": "true"
 }

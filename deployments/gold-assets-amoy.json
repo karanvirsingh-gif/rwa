@@ -20,5 +20,27 @@
     "allowedCountry": 42,
     "maxBalanceGrams": "200",
     "minPurchaseGrams": "1"
+  },
+  "GOLD-BAR-005": {
+    "assetId": "0x5e2528826e413027b141f68fed6fb5dab7724248ede88ffa93093ce48f0a39ac",
+    "token": "0xBc59Be4C6E230455827aC4E9Df9f0FAfEB853c20",
+    "vault": "0x11D09a99e44f64F53CAA096706564E541a15Cb07",
+    "treasury": "0x333e9e5c0b407041B08175403411627A103Dcf72",
+    "distributor": "0x0ed64D399Aa414Cb983fa239A439808087a5cfcF",
+    "compliance": "0xEd1bc50e86cbA3FCd5eA3744ACA2514D0B88f82c",
+    "allowedCountry": 42,
+    "maxBalanceGrams": "200",
+    "minPurchaseGrams": "1"
+  },
+  "GOLD-BAR-006": {
+    "assetId": "0x71f3fca157c316f87adedd18f55c34f9c9f66d87383f191b8584385b4823d887",
+    "token": "0x79627F79E4709F8AD6fdE7eD1287d29aeaA60Fb5",
+    "vault": "0xAEc51dd0132aeF9c631D397e3D183eF9e69162ca",
+    "treasury": "0x43946C2a4CF53BfFe12F41937B276DbD7b51f56a",
+    "distributor": "0x6f225181C2558427C9222e437E513ed3e6a7A45D",
+    "compliance": "0xDB1144b64ca8d93c976769af3dc32699525217Fd",
+    "allowedCountry": 42,
+    "maxBalanceGrams": "200",
+    "minPurchaseGrams": "1"
   }
 }

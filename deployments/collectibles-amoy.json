@@ -1,0 +1,11 @@
+{
+  "COLLECTIBLE-001": {
+    "assetId": "0x3e3e59282e03a66686f094ef1a38256203c111b199c1e3bddb86a38a929f15e6",
+    "token": "0x7b1d70766d5B3863c0E2C0c074c694be12C2806f",
+    "vault": "0x5221cBD0182Efdf372FAfdC35cdd54003cB07980",
+    "treasury": "0xD6e7F94d61314c27B407A38a043B083b6EA5844b",
+    "distributor": "0x9Eb9a1b7a8C51207E0BD7609b2302bf6bf6BcD81",
+    "compliance": "0xb2BBD80aBCe100EFC285ec36569DF015d41D67C5",
+    "maxSupply": "100"
+  }
+}

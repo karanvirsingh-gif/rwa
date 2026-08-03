@@ -1,0 +1,20 @@
+{
+  "REAL-ESTATE-001": {
+    "assetId": "0x9e2e511f2c4b3f94adbfd433640b4e61300ec233aef9d167fd3ebb79f38e303c",
+    "token": "0xD80b7bE909932ca3e54D958594344021c69e019F",
+    "vault": "0x35FEa830CB975f9F5762F0942DA3343508F21102",
+    "treasury": "0x898923635d531Ebf8731879B030df70Ef5d7c94C",
+    "distributor": "0x889bf546A83E3Db6347Cf2f799d0b85BA601C014",
+    "compliance": "0x263Ab07E9DB76DC491b0990EB29Ff8b7746B47Ea",
+    "maxSupply": "2000"
+  },
+  "REAL-ESTATE-002": {
+    "assetId": "0xd1c9533be2641170745f683853e1e14c21cae4abc91c7d633e2f93e6ee554a27",
+    "token": "0x658F245cCF2681f91653F679961a8b9c9A9AC2fb",
+    "vault": "0xDAa2AD0a8A1a888203d460da8663e2AA281C2d88",
+    "treasury": "0x4cC2B760Ca7fb1F1f0Ed9a295421095D03769Ef2",
+    "distributor": "0x3Daff5D7dC7A08cC0208279b5Ec69773D9ff0e49",
+    "compliance": "0xa1EDFaA1541544e2257c996E0cE4b3480dB3A570",
+    "maxSupply": "2000"
+  }
+}
