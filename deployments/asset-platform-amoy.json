@@ -38,11 +38,12 @@
   "SupplyLimitModuleProxy": "0xBC8E9A4EEdD0FB0fDbAe3a166Eb01401e519aEb0",
   "RWAPrivateCreditTypeRegistered": "true",
   "RWABondTypeRegistered": "true",
-   "CustodianAttestationModule": "0x639A57092b115BB4Db2bd6D048cbe985D40b4692",
   "CollectibleLockPeriodModule": "0xC6D2EF7749d3C157B013a62F1EdFa2ef853Bf507",
-  "CollectiblesAssetTypeRegistered": "true",
   "RealEstateAssetTypeRegistered": "true",
   "PhysicalReserveModuleImpl": "0xCAb0a20Aa42a249fd24faA8017713941265878Fb",
   "PhysicalReserveModuleProxy": "0xB5b0Cab3b99F2f76071F8C7525614807fFDf72c6",
-  "GoldAssetTypeRegisteredWithProxy": "true"
+  "GoldAssetTypeRegisteredWithProxy": "true",
+  "CustodianAttestationModuleImpl": "0xdb5A7Fa5fF05dF70074746B81E7dD4238e7a41Ae",
+  "CustodianAttestationModule": "0x6586F6e6f3CA9B53aE4058d14744de2B784dBF09",
+  "CollectiblesAssetTypeRegistered": "true"
 }
