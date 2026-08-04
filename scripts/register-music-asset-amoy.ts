@@ -10,6 +10,8 @@ import * as path from 'path';
  * This script registers the "MUSIC" asset type with the global AssetFactory.
  * By default, it attaches the SupplyLimitModule to enforce supply constraints.
  * 
+ * This script now uses the UUPS upgradeable Proxy pattern for the SupplyLimitModule.
+ * 
  * Run this once. After this, your backend team takes over to dynamically create 
  * individual songs whenever a catalog is onboarded.
  *
@@ -20,6 +22,7 @@ import * as path from 'path';
 
 const PLATFORM_CONFIG_PATH = path.join(__dirname, '../deployments/asset-platform-amoy.json');
 const ASSET_TYPE_MUSIC = ethers.utils.formatBytes32String('MUSIC');
+const DELAY_MS = 2000;
 
 // --- Utility Functions ---
 
@@ -36,69 +39,8 @@ function savePlatformConfig(key: string, value: string) {
   fs.writeFileSync(PLATFORM_CONFIG_PATH, JSON.stringify(config, null, 2));
 }
 
-async function getGasPrice() {
-  const feeData = await ethers.provider.getFeeData();
-  // Add a 50% buffer to current gas price, or default to 35 gwei
-  return feeData.gasPrice?.mul(150).div(100) || ethers.utils.parseUnits('35', 'gwei');
-}
-
-// --- Core Deployment Logic ---
-
-async function deploySupplyLimitModule(existingAddress: string, gasPrice: any): Promise<string> {
-  if (existingAddress) {
-    console.log(`\n✓ SupplyLimitModule is already deployed at: ${existingAddress}`);
-    return existingAddress;
-  }
-
-  console.log('\nDeploying SupplyLimitModule...');
-  const SupplyLimitModule = await ethers.getContractFactory('SupplyLimitModule');
-  const module = await SupplyLimitModule.deploy({ gasPrice });
-  await module.deployed();
-  
-  console.log(`  ✓ SupplyLimitModule deployed to: ${module.address}`);
-  
-  const tx = await module.initialize({ gasPrice });
-  await tx.wait();
-  console.log('  ✓ SupplyLimitModule initialized');
-  
-  savePlatformConfig('SupplyLimitModule', module.address);
-  return module.address;
-}
-
-async function registerMusicAssetType(
-  assetFactory: any, 
-  deployer: any, 
-  isAlreadyRegistered: boolean, 
-  supplyLimitModuleAddress: string, 
-  gasPrice: any
-) {
-  if (isAlreadyRegistered) {
-    console.log('\n✓ MUSIC asset type is already registered.');
-    return;
-  }
-
-  console.log('\n1. Registering MUSIC asset type on the Factory...');
-  const tx = await assetFactory.connect(deployer).registerAssetType(
-    ASSET_TYPE_MUSIC, 
-    [supplyLimitModuleAddress], 
-    { gasPrice }
-  );
-  await tx.wait();
-  
-  savePlatformConfig('MusicAssetTypeRegistered', 'true');  
-  console.log('  ✓ Successfully bound compliance modules to "MUSIC".');
-}
-
-function printSuccessSummary(factoryAddress: string, moduleAddress: string) {
-  console.log('\n=============================================================');
-  console.log('🚀 SETUP COMPLETE!');
-  console.log('You must provide the following to your BACKEND team:');
-  console.log(`1. AssetFactory Address:      ${factoryAddress}`);
-  console.log(`2. Asset Type String:          "MUSIC"`);
-  console.log(`3. SupplyLimitModule:         ${moduleAddress}`);
-  console.log('\nWhen a new song is onboarded, the backend will use the Factory');
-  console.log('to create the asset with the built-in YieldDistributor and modules.');
-  console.log('=============================================================');
+async function delay(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 // --- Main Execution ---
@@ -111,7 +53,7 @@ async function main() {
     throw new Error('Run deploy-asset-platform-amoy.ts first. AssetFactory not found.');
   }
 
-  const gasPrice = await getGasPrice();
+  // We rely on hardhat.config.ts for gas price now, so we don't need manual overrides here.
   
   console.log(`Deployer: ${deployer.address}`);
   console.log(`Connecting to AssetFactory at: ${platformConfig.AssetFactory}`);
@@ -119,23 +61,70 @@ async function main() {
   // 1. Setup Contracts
   const assetFactory = await ethers.getContractAt('AssetFactory', platformConfig.AssetFactory);
 
-  // 2. Deploy or Load Dependencies
-  const supplyLimitModuleAddress = await deploySupplyLimitModule(
-    platformConfig.SupplyLimitModule, 
-    gasPrice
-  );
+  // ===========================================================================
+  // Step 2: SupplyLimitModule — implementation
+  // ===========================================================================
+  let supplyLimitImplAddress = platformConfig.SupplyLimitModuleImpl;
 
-  // 3. Register Asset Type
-  await registerMusicAssetType(
-    assetFactory, 
-    deployer, 
-    platformConfig.MusicAssetTypeRegistered, 
-    supplyLimitModuleAddress, 
-    gasPrice
-  );
+  if (!supplyLimitImplAddress) {
+    console.log('\nDeploying SupplyLimitModule implementation...');
+    const impl = await ethers.deployContract('SupplyLimitModule', []);
+    await impl.deployed();
+    supplyLimitImplAddress = impl.address;
+    savePlatformConfig('SupplyLimitModuleImpl', supplyLimitImplAddress);
+    console.log(`  ✓ Impl deployed at: ${supplyLimitImplAddress}`);
+    await delay(DELAY_MS);
+  } else {
+    console.log(`\n✓ SupplyLimitModule impl already at: ${supplyLimitImplAddress}`);
+  }
 
-  // 4. Print Summary
-  printSuccessSummary(platformConfig.AssetFactory, supplyLimitModuleAddress);
+  // ===========================================================================
+  // Step 3: SupplyLimitModule — UUPS proxy (permanent address)
+  // ===========================================================================
+  let supplyLimitProxyAddress = platformConfig.SupplyLimitModuleProxy;
+
+  if (!supplyLimitProxyAddress) {
+    console.log('\nDeploying SupplyLimitModule proxy (UUPS)...');
+    const supplyImpl = await ethers.getContractAt('SupplyLimitModule', supplyLimitImplAddress);
+    const initData = supplyImpl.interface.encodeFunctionData('initialize', []);
+    const proxy = await ethers.deployContract('ModuleProxy', [supplyLimitImplAddress, initData]);
+    await proxy.deployed();
+    supplyLimitProxyAddress = proxy.address;
+    savePlatformConfig('SupplyLimitModuleProxy', supplyLimitProxyAddress);
+    console.log(`  ✓ Proxy deployed at: ${supplyLimitProxyAddress}`);
+    await delay(DELAY_MS);
+  } else {
+    console.log(`\n✓ SupplyLimitModule proxy already at: ${supplyLimitProxyAddress}`);
+  }
+
+  // ===========================================================================
+  // Step 4: Register MUSIC asset type using PROXY addresses
+  // ===========================================================================
+  const isAlreadyRegistered = platformConfig.MusicAssetTypeRegistered;
+
+  if (isAlreadyRegistered) {
+    console.log('\n✓ MUSIC asset type is already registered.');
+  } else {
+    console.log('\nRegistering MUSIC asset type on the Factory...');
+    const tx = await assetFactory
+      .connect(deployer)
+      .registerAssetType(ASSET_TYPE_MUSIC, [supplyLimitProxyAddress]);
+    await tx.wait();
+    
+    savePlatformConfig('MusicAssetTypeRegistered', 'true');  
+    console.log('  ✓ Successfully bound SupplyLimitModule (proxy) to "MUSIC".');
+  }
+
+  // 5. Print Summary
+  console.log('\n=============================================================');
+  console.log('🚀 SETUP COMPLETE!');
+  console.log('You must provide the following to your BACKEND team:');
+  console.log(`1. AssetFactory Address:      ${platformConfig.AssetFactory}`);
+  console.log(`2. Asset Type String:          "MUSIC"`);
+  console.log(`3. SupplyLimitModule (proxy): ${supplyLimitProxyAddress}   <-- use this`);
+  console.log('\nWhen a new song is onboarded, the backend will use the Factory');
+  console.log('to create the asset with the built-in YieldDistributor and modules.');
+  console.log('=============================================================');
 }
 
 main().catch((error) => {
