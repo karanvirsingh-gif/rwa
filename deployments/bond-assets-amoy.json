@@ -1,0 +1,31 @@
+{
+  "CORP-BOND-001": {
+    "assetId": "0x438bfeb13ab2749ba2d0facaedb9d2b2833dbc0f5b070ad9eec3ac26a47a1a7d",
+    "bondType": "Perpetual Bond",
+    "token": "0x15B154575076e88646bB474cde56bB7c3Ad81Fb9",
+    "vault": "0xEbDD9FCdd01cFbecdb85a20fcBE694F40d01DeAB",
+    "treasury": "0x5327f49290eD78391426234cfB19c3Db22177E58",
+    "distributor": "0xd515218d27cfE8a2510eBc9A4680abB10693294c",
+    "lifecycleModule": "0x6E4787a1FE0d434F7018c2f6c1eBB1A3DE95e4bc",
+    "targetRaiseUsdc": "500000",
+    "borrower": "0xF8109DA7114395E5d54Ec7041cB0Ffa10E05C4F3",
+    "hasRefund": false,
+    "hasMaturity": false
+  },
+  "CORP-BOND-002": {
+    "assetId": "0xed797da3a3c2e649b93be077ad8a4010ef866d042352a6b4dab008c0859a8ebc",
+    "token": "0x97982eb38c2aEa1bBB078294e4645Eb79A447960",
+    "vault": "0x343F4EE8E6Df2d06A6eD51A2eb4AE54820D161d4",
+    "treasury": "0x7aAB056Ae8f9A4085D8689808ce292E290f73837",
+    "distributor": "0xEc34eB5D1BA9b3236325AEe41d9d39001cffb042",
+    "stateModule": "0x22a8d9633424593dF47CC78a726D0D049665Dfcb",
+    "assetType": "BOND",
+    "faceValueUsdc": "100000",
+    "couponRateBps": 600,
+    "hasRefund": false,
+    "hasMaturity": true,
+    "subscriptionDeadline": "2026-09-03T08:15:33.000Z",
+    "maturityDate": "2028-08-23T08:15:33.000Z",
+    "issuer": "0xF8109DA7114395E5d54Ec7041cB0Ffa10E05C4F3"
+  }
+}

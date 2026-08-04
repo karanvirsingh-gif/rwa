@@ -10,6 +10,17 @@
     "maxBalanceGrams": "200",
     "minPurchaseGrams": "1"
   },
+  "GOLD-BAR-003": {
+    "assetId": "0x8855e0333ad9110a5ec5d0c8f7135881f0743276e5aa3509f8d41c0373014820",
+    "token": "0x467C69D6f498C5DE420B0535D1175bA2b6119101",
+    "vault": "0x27A0Ff44Ab1F0B46238651A518F3B9Da76750a8D",
+    "treasury": "0x64e2310f06c1A5E7A577317C832Fc93aA095065a",
+    "distributor": "0x6EA13958f0692B01502d61C368B97b0f62B9435d",
+    "compliance": "0x47a820027eB1BB3bF6042d99Ff26a7fcc690d05f",
+    "allowedCountry": 42,
+    "maxBalanceGrams": "200",
+    "minPurchaseGrams": "1"
+  },
   "GOLD-BAR-007": {
     "assetId": "0x90c56aa6e97dbd567fc38dfc33edc8b599c347b14fafff58f80e82191c5d9f6c",
     "token": "0xcA550E8f95e344700E92A1A64a72feD79aBa0502",
