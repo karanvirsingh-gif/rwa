@@ -16,5 +16,21 @@
     "distributor": "0x1f1bBc87aD37A1349D108519238e82bD8347cd89",
     "compliance": "0x3aFfAd18E610997e93256c237a8168bec47b8dA6",
     "supplyLimit": "10000"
+  },
+  "MUSIC-919143": {
+    "assetId": "0x5353af1af0450bad0b881052562567af1b64ce630ebd9116128f74a2c612cab5",
+    "token": "0x73F5b87f4DdC0ba15a340D4c6876299347B5e74f",
+    "vault": "0xb5A2E465aEcB102aE879748726E183E4f7f938E9",
+    "treasury": "0xe2337086f6B8E67Cdf5a85C3B543E91675E53840",
+    "distributor": "0xE8e6e27C763dABf6DBfdEa1fbf8Da627fe54Ca15",
+    "compliance": "0xF978c816beE4De87D5E90f3E4d10C66018A703Dd"
+  },
+  "MUSIC-798979": {
+    "assetId": "0xd5bb0626faac295ddecbf3a60446f3d48374104601bf86cc21e60cc945d42ef0",
+    "token": "0x7D430913293ea845686Af65746D0e10A7552D0f3",
+    "vault": "0x5b8c83e74F9f00Faf77B5334e7cD197952D7e17e",
+    "treasury": "0x414C04c3FB61B141A4FeB6FADdA6F7f30572Bb5F",
+    "distributor": "0xaDd9FFc039a09382Cc954000d92dDB062Ba6d3a8",
+    "compliance": "0x47d2F031fBBA8f18df39055B683860A124778910"
   }
 }
