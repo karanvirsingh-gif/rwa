@@ -38,7 +38,7 @@ import * as path from 'path';
 // =============================================================================
 // CONFIGURATION - edit these per bond issuance
 // =============================================================================
-const BOND_ASSET_SALT = 'CORP-BOND-001';      // Must be unique across all assets
+const BOND_ASSET_SALT = 'CORP-BOND-002';      // Must be unique across all assets
 const BOND_FACE_VALUE_USDC = '100000';            // Total issuance size in USDC
 const COUPON_RATE_BPS = 600;                   // 6.00% annual coupon (informative on-chain)
 const PAYMENT_FREQUENCY_DAYS = 90;               // Quarterly coupon payments

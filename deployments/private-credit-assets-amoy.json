@@ -18,5 +18,33 @@
     "stateModule": "0x6E4787a1FE0d434F7018c2f6c1eBB1A3DE95e4bc",
     "targetPrincipalUsdc": "10000",
     "borrower": "0xF8109DA7114395E5d54Ec7041cB0Ffa10E05C4F3"
+  },
+  "CORP-LOAN-004": {
+    "assetId": "0x4bcc9d5700beb496fe323c70e674dd6b0d56497cfc493a526058cd96be529a24",
+    "token": "0xe703D287f4cec3D6544568D3E0ed2a44e92B6c85",
+    "vault": "0xd1AC69181B1Ff637dA899F98BBA5De5f2943197d",
+    "treasury": "0xce4090E88F296BA51D63dd5845A6AE908bF11c1a",
+    "distributor": "0xD9a7c50883464d4AcDE2a79f776D4cdC774eA672",
+    "stateModule": "0x22a8d9633424593dF47CC78a726D0D049665Dfcb",
+    "assetType": "PRIVATE_CREDIT",
+    "targetPrincipalUsdc": "50000",
+    "couponRateBps": 850,
+    "fundingDeadline": "2026-08-18T08:06:53.000Z",
+    "maturityDate": "2027-08-13T08:06:53.000Z",
+    "borrower": "0xF8109DA7114395E5d54Ec7041cB0Ffa10E05C4F3"
+  },
+  "CORP-LOAN-005": {
+    "assetId": "0x8bec82881f57b382bab6f87547076f021ec6a52d3c47866b2f2ebbdf16e94163",
+    "token": "0x360cd17745c652316C7FDEFbea813D7Bd2729FdF",
+    "vault": "0xd3C5745488Be3693149D6c0f558AF7c4f2a604DD",
+    "treasury": "0xFb15b7f04D0BB0B7eb4584b2Ec27A63415f3Ef2C",
+    "distributor": "0xfA13890E73a089DeD8Eac0891a64fE0F98329Be1",
+    "stateModule": "0x22a8d9633424593dF47CC78a726D0D049665Dfcb",
+    "assetType": "PRIVATE_CREDIT",
+    "targetPrincipalUsdc": "50000",
+    "couponRateBps": 850,
+    "fundingDeadline": "2026-08-18T08:09:53.000Z",
+    "maturityDate": "2027-08-13T08:09:53.000Z",
+    "borrower": "0xF8109DA7114395E5d54Ec7041cB0Ffa10E05C4F3"
   }
 }
