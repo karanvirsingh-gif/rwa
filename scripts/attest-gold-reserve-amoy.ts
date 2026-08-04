@@ -35,14 +35,14 @@ async function main() {
   if (!asset) {
     throw new Error(`No record for "${GOLD_ASSET_SALT}" in deployments/gold-assets-amoy.json - run create-gold-asset-amoy.ts first.`);
   }
-  if (!platform.PhysicalReserveModule) {
-    throw new Error('Run deploy-asset-platform-amoy.ts first.');
+  if (!platform.PhysicalReserveModuleProxy) {
+    throw new Error('PhysicalReserveModuleProxy not found in asset-platform-amoy.json. Run register-gold-amoy.ts first.');
   }
 
   const feeData = await ethers.provider.getFeeData();
   const gasPrice = feeData.gasPrice?.mul(150).div(100) || ethers.utils.parseUnits('35', 'gwei');
 
-  const module = await ethers.getContractAt('PhysicalReserveModule', platform.PhysicalReserveModule);
+  const module = await ethers.getContractAt('PhysicalReserveModule', platform.PhysicalReserveModuleProxy);
 
   console.log(`Attesting ${ATTESTED_GRAMS}g backing for "${GOLD_ASSET_SALT}" (compliance ${asset.compliance})...`);
   const tx = await module

@@ -9,5 +9,16 @@
     "allowedCountry": 42,
     "maxBalanceGrams": "200",
     "minPurchaseGrams": "1"
+  },
+  "GOLD-BAR-007": {
+    "assetId": "0x90c56aa6e97dbd567fc38dfc33edc8b599c347b14fafff58f80e82191c5d9f6c",
+    "token": "0xcA550E8f95e344700E92A1A64a72feD79aBa0502",
+    "vault": "0xAD47E096308144Fa391b14b1F0ae045cbaba0949",
+    "treasury": "0x5a3428C060b36Fd2b7e5016804A06f751bf29773",
+    "distributor": "0x422F0413D07C33a8A4e423aF8AF924057bD9AB1E",
+    "compliance": "0x7e16360b92f3F959ccB26C4DDbe71d75d0d913fC",
+    "allowedCountry": 42,
+    "maxBalanceGrams": "200",
+    "minPurchaseGrams": "1"
   }
 }

@@ -26,12 +26,16 @@
   "P2PMarketplaceImpl": "0xfa39afc974B634B10dAD02b9A23e42374e16dfe6",
   "P2PMarketplace": "0x044C6247cBab3a7950d3924DAf359ab814649A4D",
   "PhysicalReserveModule": "0x5F09226829f2358CdF02D4611Fd09b75Df3bFa00",
-  "GoldAssetTypeRegistered": "true",
   "CountryAllowModule": "0x859CdaAc6203caBd884a2bA3c62df3117a3CcdA4",
   "MaxBalanceModule": "0x49aBB8cF52b55E4054F3D5B7faC846cde7168Ed4",
   "MinimumInvestmentModule": "0xb18a37403858ac4AfB8Cd05e9E31074633Cd09a3",
   "CustodianAttestationModule": "0x639A57092b115BB4Db2bd6D048cbe985D40b4692",
   "CollectibleLockPeriodModule": "0xC6D2EF7749d3C157B013a62F1EdFa2ef853Bf507",
   "CollectiblesAssetTypeRegistered": "true",
-  "SupplyLimitModule": "0x8f476bb91026Fb66a0B71656089c85984CA18B8A"
+  "SupplyLimitModuleImpl": "0xA28DA919e493ce70b93eeD79225280F57790c322",
+  "SupplyLimitModuleProxy": "0xBC8E9A4EEdD0FB0fDbAe3a166Eb01401e519aEb0",
+  "RealEstateAssetTypeRegistered": "true",
+  "PhysicalReserveModuleImpl": "0xCAb0a20Aa42a249fd24faA8017713941265878Fb",
+  "PhysicalReserveModuleProxy": "0xB5b0Cab3b99F2f76071F8C7525614807fFDf72c6",
+  "GoldAssetTypeRegisteredWithProxy": "true"
 }

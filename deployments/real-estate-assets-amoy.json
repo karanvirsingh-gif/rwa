@@ -1,0 +1,11 @@
+{
+  "REAL-ESTATE-004": {
+    "assetId": "0xf7339bf4163edf977d3a1f3a384d832c6004eeaf14ef12cd367f536214c19536",
+    "token": "0x1d2791f565d8a396adaA9DFbC599de91e1C18BD3",
+    "vault": "0x1f7Ea2D7f32f8d1970D5aDdED4955F53AD1d832D",
+    "treasury": "0x7A8B2ef5Ae25008af1B26F992d577f6F7ae5679B",
+    "distributor": "0x706E787698Bb5C54723fDAaA4784e303dB1B82A7",
+    "compliance": "0xC609dd6a1C80F57Ac97d5F36F619b59B0644B45f",
+    "maxSupply": "2000"
+  }
+}
