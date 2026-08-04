@@ -31,8 +31,12 @@
   "MaxBalanceModule": "0x49aBB8cF52b55E4054F3D5B7faC846cde7168Ed4",
   "MinimumInvestmentModule": "0xb18a37403858ac4AfB8Cd05e9E31074633Cd09a3",
   "PrivateCreditStateModule": "0x1a0f0F6dCaE9cce08C64d5945DB551D68aAaB7B4",
-  "PrivateCreditAssetTypeRegistered": "true",
-  "SupplyLimitModule": "0x8f476bb91026Fb66a0B71656089c85984CA18B8A",
+  "MusicAssetTypeRegistered": "true",
   "PrivateCreditAssetTypeRegisteredV2": "true",
-  "MusicAssetTypeRegistered": "true"
+  "RWALifecycleModuleImpl": "0x1CC73F32A028C4dD7337B4252aF0D0f84111c80D",
+  "RWALifecycleModule": "0x22a8d9633424593dF47CC78a726D0D049665Dfcb",
+  "SupplyLimitModuleImpl": "0xA28DA919e493ce70b93eeD79225280F57790c322",
+  "SupplyLimitModuleProxy": "0xBC8E9A4EEdD0FB0fDbAe3a166Eb01401e519aEb0",
+  "RWAPrivateCreditTypeRegistered": "true",
+  "RWABondTypeRegistered": "true"
 }

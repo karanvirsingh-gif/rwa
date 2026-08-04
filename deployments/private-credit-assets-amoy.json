@@ -1,0 +1,22 @@
+{
+  "CORP-LOAN-002": {
+    "assetId": "0x215f636a41ad0c1b3c5915163afd3ec89a8c907f6d444982efbb7ac95cc580ec",
+    "token": "0x3a23479D72a150f63DdC956a2a7bb9cDF826Ea78",
+    "vault": "0x8BF57daFDb3eAf51695F0DE97c2A094901450EE3",
+    "treasury": "0x0831F3e708d5b931cA4D615B1E9FEC6D976BB09E",
+    "distributor": "0xFc7069641af745452B8ef0aB241CC596605351dD",
+    "stateModule": "0x1a0f0F6dCaE9cce08C64d5945DB551D68aAaB7B4",
+    "targetPrincipalUsdc": "10000",
+    "borrower": "0xF8109DA7114395E5d54Ec7041cB0Ffa10E05C4F3"
+  },
+  "CORP-LOAN-003": {
+    "assetId": "0x2da11c83d41b4e4a262c1d86393c4c646b6c22381fd608fb6c39034ed98b401d",
+    "token": "0x115ee6F80300A7cbd1eF43191b72a3d59Ce954Cf",
+    "vault": "0xa36d0cF8F4c4253f7FA8BcA04c3b628B4696C9C3",
+    "treasury": "0x40c335Ce8C864FF1D8BA70298c7653D29171C156",
+    "distributor": "0xe96d501A691f9975525a3f7720074876b5068a41",
+    "stateModule": "0x6E4787a1FE0d434F7018c2f6c1eBB1A3DE95e4bc",
+    "targetPrincipalUsdc": "10000",
+    "borrower": "0xF8109DA7114395E5d54Ec7041cB0Ffa10E05C4F3"
+  }
+}
