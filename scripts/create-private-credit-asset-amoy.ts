@@ -24,7 +24,7 @@ import * as path from 'path';
 // =============================================================================
 // CONFIGURATION - edit these per private credit loan
 // =============================================================================
-const LOAN_ASSET_SALT = 'CORP-LOAN-005';          // Must be unique across all assets
+const LOAN_ASSET_SALT = 'CORP-LOAN-009';          // Must be unique across all assets
 const TARGET_PRINCIPAL_USDC = '50000';             // Total raise target in USDC
 const COUPON_RATE_BPS = 850;                       // 8.50% annual coupon (informative on-chain)
 const PAYMENT_FREQUENCY_DAYS = 30;                 // Coupon payment every 30 days

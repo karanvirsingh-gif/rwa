@@ -50,6 +50,7 @@ contract AssetVault is
     event FiatCredited(address indexed beneficiary, uint256 amount, string offchainRef);
     event Redeemed(address indexed investor, uint256 amount, uint256 payout);
     event PriceUpdated(uint256 newPrice);
+    event RecoveryRedeemed(address indexed investor, uint256 tokenAmount, uint256 payout);
 
     /// @custom:oz-upgrades-unsafe-allow constructor
     constructor() {
@@ -148,6 +149,44 @@ contract AssetVault is
         treasury.payout(msg.sender, payoutAmount);
 
         emit Redeemed(msg.sender, amount, payoutAmount);
+    }
+
+    /// @dev RECOVERY-state-only redemption. Callable after a defaulted asset enters
+    ///      RECOVERY state via RWALifecycleModule.transitionToRecovery().
+    ///
+    ///      Payout is pro-rata: investor receives a share of whatever was deposited
+    ///      into the treasury as legal settlement proceeds:
+    ///
+    ///          payout = (amount / totalSupplyBeforeBurn) × treasury.balance()
+    ///
+    ///      This is self-balancing: as investors redeem, both totalSupply and
+    ///      treasury balance decrease proportionally, so every investor gets the
+    ///      same per-token rate regardless of when they redeem. The last investor
+    ///      to burn receives the remaining dust.
+    ///
+    ///      Pre-conditions (enforced off-chain by the platform before calling
+    ///      transitionToRecovery):
+    ///        1. AssetTreasury.deposit() has been called with the recovered amount.
+    ///        2. RWALifecycleModule is in RECOVERY state (burns are allowed).
+    ///
+    /// @param amount Number of tokens to burn (must be ≤ caller's balance).
+    function redeemRecovery(uint256 amount) external nonReentrant whenNotPaused {
+        require(amount > 0, 'amount must be greater than 0');
+
+        uint256 supplyBeforeBurn = token.totalSupply();
+        require(supplyBeforeBurn > 0, 'no token supply');
+
+        uint256 treasuryBalance = paymentToken.balanceOf(address(treasury));
+        require(treasuryBalance > 0, 'no recovery funds in treasury');
+
+        // Pro-rata share: (investor tokens / total supply) x recovery pool
+        uint256 payoutAmount = (amount * treasuryBalance) / supplyBeforeBurn;
+        require(payoutAmount > 0, 'payout rounds to zero');
+
+        token.burn(msg.sender, amount); // compliance module must be in RECOVERY state or this reverts
+        treasury.payout(msg.sender, payoutAmount);
+
+        emit RecoveryRedeemed(msg.sender, amount, payoutAmount);
     }
 
     // =========================================================================

@@ -16,10 +16,10 @@
   "FactoryLinkSet": "true",
   "AssetRegistryImpl": "0x5Bb53a10Db90a6b73A26C1b90d8eB350c014b0A5",
   "AssetRegistry": "0xaa97837382bC85427785d8f49aE7e7c23087Bf5f",
-  "AssetTreasuryImpl": "0x95eF0f5f520f9Bf3aC5B4EDC153d6631d52aE270",
-  "AssetVaultImpl": "0x8EE923221a0DA682C634fCc5fE7D43c01c2515cb",
+  "AssetTreasuryImpl": "0xf66498BA6626E37c872eFEA11497C1DE87a67c00",
+  "AssetVaultImpl": "0xe447177ceF6cB3Fb108b9A26EBE7F6D98717cB2f",
   "YieldDistributorImpl": "0x68e4b9369C1C23EF49aA32281798850E6fcE2dc3",
-  "AssetFactoryImpl": "0xe4b6f1b59E8665060d044BD31a8DF744D4281b0B",
+  "AssetFactoryImpl": "0x760c7761708eAA96352f8F887bb5293B70f32F09",
   "AssetFactory": "0xc648e1666Aee0fA9B7b10f1C8d07dCC4e00c655f",
   "TrexFactoryOwnershipTransferred": "true",
   "RegisterRoleGranted": "true",
@@ -32,7 +32,7 @@
   "PrivateCreditStateModule": "0x1a0f0F6dCaE9cce08C64d5945DB551D68aAaB7B4",
   "MusicAssetTypeRegistered": "true",
   "PrivateCreditAssetTypeRegisteredV2": "true",
-  "RWALifecycleModuleImpl": "0x1CC73F32A028C4dD7337B4252aF0D0f84111c80D",
+  "RWALifecycleModuleImpl": "0xE91bc9bFF92694CBF876C4Dd46D2e703b1c26EFe",
   "RWALifecycleModule": "0x22a8d9633424593dF47CC78a726D0D049665Dfcb",
   "SupplyLimitModuleImpl": "0xA28DA919e493ce70b93eeD79225280F57790c322",
   "SupplyLimitModuleProxy": "0xBC8E9A4EEdD0FB0fDbAe3a166Eb01401e519aEb0",
@@ -45,5 +45,9 @@
   "GoldAssetTypeRegisteredWithProxy": "true",
   "CustodianAttestationModuleImpl": "0xdb5A7Fa5fF05dF70074746B81E7dD4238e7a41Ae",
   "CustodianAttestationModule": "0x6586F6e6f3CA9B53aE4058d14744de2B784dBF09",
-  "CollectiblesAssetTypeRegistered": "true"
+  "CollectiblesAssetTypeRegistered": "true",
+  "RWALifecycleModuleImplV1": "0x1CC73F32A028C4dD7337B4252aF0D0f84111c80D",
+  "AssetTreasuryImplV1": "0x95eF0f5f520f9Bf3aC5B4EDC153d6631d52aE270",
+  "AssetVaultImplV1": "0x8EE923221a0DA682C634fCc5fE7D43c01c2515cb",
+  "AssetFactoryImplV1": "0xe4b6f1b59E8665060d044BD31a8DF744D4281b0B"
 }

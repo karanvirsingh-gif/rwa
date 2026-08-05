@@ -27,11 +27,11 @@ import '../../../token/IToken.sol';
  *                        |                                |
  *                        v                                v
  *      [hasRefund=true] REFUND          ACTIVE ---------> DEFAULTED
- *                                         |
- *                          [hasMaturity=true]
- *                                         |
- *                                         v
- *                                       MATURED
+ *                                         |                    |
+ *                          [hasMaturity=true]    [legal settlement]
+ *                                         |                    v
+ *                                         v                RECOVERY
+ *                                       MATURED       (burn=pro-rata claim)
  *
  *      Private Credit enforcement:
  *        - hasRefund = true (always)
@@ -59,11 +59,12 @@ contract RWALifecycleModule is AbstractModuleUpgradeable {
     }
 
     enum LoanState {
-        FUNDING,    // Initial escrow / capital-raising phase
-        ACTIVE,     // Fully funded and live; P2P trading enabled
-        MATURED,    // [hasMaturity=true] Loan/bond reached maturity; P2P frozen, burn to redeem
-        DEFAULTED,  // All transfers strictly frozen until governance acts
-        REFUND      // [hasRefund=true] Funding failed; burn-only (investor refunds)
+        FUNDING,    // 0 — Initial escrow / capital-raising phase
+        ACTIVE,     // 1 — Fully funded and live; P2P trading enabled
+        MATURED,    // 2 — [hasMaturity=true] Loan/bond reached maturity; P2P frozen, burn to redeem
+        DEFAULTED,  // 3 — All transfers strictly frozen until governance acts
+        REFUND,     // 4 — [hasRefund=true] Funding failed; burn-only (investor refunds)
+        RECOVERY    // 5 — Post-legal-settlement; burn-only for pro-rata redemption via AssetVault.redeemRecovery()
     }
 
     // =========================================================================
@@ -82,6 +83,8 @@ contract RWALifecycleModule is AbstractModuleUpgradeable {
         LoanState state;            // Current lifecycle state
         bool hasRefund;             // If false, REFUND state is unreachable for this asset
         bool hasMaturity;           // If false, MATURED state is unreachable + no auto-freeze
+        // --- Recovery fields (appended; safe for UUPS upgrade) ---
+        bytes32 settlementHash;     // SHA-256 hash of the signed legal settlement document (set on transitionToRecovery)
     }
 
     // =========================================================================
@@ -133,6 +136,13 @@ contract RWALifecycleModule is AbstractModuleUpgradeable {
      * @dev Emitted on every lifecycle state change.
      */
     event StateTransition(address indexed token, LoanState oldState, LoanState newState);
+
+    /**
+     * @dev Emitted when a defaulted asset enters RECOVERY state after legal settlement.
+     * @param token          The ERC-3643 token address
+     * @param settlementHash SHA-256 hash of the signed legal settlement document
+     */
+    event RecoveryInitiated(address indexed token, bytes32 settlementHash);
 
     // =========================================================================
     // Initializer (replaces constructor -- called once via ModuleProxy)
@@ -216,7 +226,8 @@ contract RWALifecycleModule is AbstractModuleUpgradeable {
             borrower: borrower,
             state: LoanState.FUNDING,
             hasRefund: hasRefund,
-            hasMaturity: hasMaturity
+            hasMaturity: hasMaturity,
+            settlementHash: bytes32(0) // populated only when transitionToRecovery() is called
         });
 
         emit LoanInitialized(token, assetType, targetPrincipal, fundingDeadline, borrower, hasRefund, hasMaturity);
@@ -289,6 +300,30 @@ contract RWALifecycleModule is AbstractModuleUpgradeable {
     }
 
     /**
+     * @dev Transition from DEFAULTED to RECOVERY after legal settlement concludes.
+     *
+     *      Pre-conditions (caller must ensure BEFORE calling this):
+     *        1. AssetTreasury.deposit() has been called with the recovered USDC amount.
+     *        2. The signed settlement document hash is available.
+     *
+     *      Post-conditions:
+     *        - Burns are now allowed via moduleCheck() (investors call AssetVault.redeemRecovery())
+     *        - Minting and P2P transfers remain blocked
+     *        - settlementHash is stored on-chain as a permanent audit trail
+     *
+     * @param token          The token address to transition.
+     * @param settlementHash SHA-256 hash of the signed off-chain legal settlement document.
+     *                       Must be non-zero — used as proof that settlement occurred.
+     */
+    function transitionToRecovery(address token, bytes32 settlementHash) external onlyOwner {
+        require(settlementHash != bytes32(0), 'Settlement hash required');
+        RWALifecycleStorage storage s = _getStorage();
+        s.loanConfigs[token].settlementHash = settlementHash;
+        _transition(token, LoanState.DEFAULTED, LoanState.RECOVERY);
+        emit RecoveryInitiated(token, settlementHash);
+    }
+
+    /**
      * @dev Internal state transition helper. Validates old state and emits event.
      */
     function _transition(address token, LoanState requiredOldState, LoanState newState) internal {
@@ -312,10 +347,12 @@ contract RWALifecycleModule is AbstractModuleUpgradeable {
      *        ACTIVE   : mint BLOCKED | burn OK | P2P OK  (unless hasMaturity && past maturityTimestamp)
      *        REFUND   : mint BLOCKED | burn OK | P2P BLOCKED  (hasRefund=true only; burn=refund)
      *        MATURED  : mint BLOCKED | burn OK | P2P BLOCKED  (hasMaturity=true only; burn=redemption)
-     *        DEFAULTED: all BLOCKED (frozen until restructuring)
+     *        DEFAULTED: all BLOCKED (frozen until restructuring / legal settlement)
+     *        RECOVERY : mint BLOCKED | burn OK | P2P BLOCKED  (post-settlement; burn=pro-rata claim via redeemRecovery())
      *
      *      Uninitialized tokens (targetPrincipal == 0) pass through without restriction.
      */
+    // solhint-disable-next-line code-complexity
     function moduleCheck(
         address _from,
         address _to,
@@ -353,8 +390,13 @@ contract RWALifecycleModule is AbstractModuleUpgradeable {
             if (isMint || isP2P) return false;
 
         } else if (config.state == LoanState.DEFAULTED) {
-            // Defaulted: all movement blocked -- governance must restructure first
+            // Defaulted: all movement blocked -- governance must restructure first via transitionToRecovery()
             return false;
+
+        } else if (config.state == LoanState.RECOVERY) {
+            // Post-settlement: minting and P2P frozen; burn-only for pro-rata redemption
+            // Investors call AssetVault.redeemRecovery() which triggers the burn through here
+            if (isMint || isP2P) return false;
         }
 
         return true;
