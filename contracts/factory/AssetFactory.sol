@@ -214,6 +214,7 @@ contract AssetFactory is Initializable, UUPSUpgradeable, AccessControlUpgradeabl
 
         AssetTreasury t = AssetTreasury(treasury);
         _moveRole(t, t.WITHDRAWER_ROLE(), admin);
+        _moveRole(t, t.UPGRADER_ROLE(), admin);      // move the newly added UPGRADER_ROLE
         _moveRole(t, t.DEFAULT_ADMIN_ROLE(), admin); // must be last on this contract
 
         AssetVault v = AssetVault(vault);

@@ -45,11 +45,14 @@ contract AssetVault is
     AssetTreasury public treasury;
     PaymentMode public paymentMode;
     uint256 public pricePerUnit;   // in paymentToken units, per whole unit of token (10**token.decimals())
+    bool public isRecoveryMode;    // when true, redeem() routes to pro-rata recovery payout instead of fixed-price
 
     event Settled(address indexed beneficiary, uint256 amount, uint256 cost);
     event FiatCredited(address indexed beneficiary, uint256 amount, string offchainRef);
     event Redeemed(address indexed investor, uint256 amount, uint256 payout);
     event PriceUpdated(uint256 newPrice);
+    event RecoveryRedeemed(address indexed investor, uint256 tokenAmount, uint256 payout);
+    event RecoveryModeSet(bool status);
 
     /// @custom:oz-upgrades-unsafe-allow constructor
     constructor() {
@@ -137,10 +140,30 @@ contract AssetVault is
     // Redemption
     // =========================================================================
 
-    /// @dev WALLET-triggered self-service redemption - burn own tokens, atomic payout
-    /// from the paired Treasury in the same transaction.
+    /// @dev WALLET-triggered self-service redemption — single unified entry point.
+    ///
+    ///      Routes internally based on `isRecoveryMode`:
+    ///        - false (default): standard fixed-price redemption via _redeemStandard()
+    ///        - true:            pro-rata recovery redemption via _redeemRecovery()
+    ///
+    ///      The routing flag is set by the asset admin (DEFAULT_ADMIN_ROLE) atomically
+    ///      alongside RWALifecycleModule.transitionToRecovery(). Once activated, the
+    ///      standard fixed-price path is permanently blocked for this vault instance,
+    ///      preventing any investor from draining the treasury at the wrong exchange rate.
+    ///
+    /// @param amount Number of tokens to burn (must be <= caller's balance).
     function redeem(uint256 amount) external nonReentrant whenNotPaused {
         require(amount > 0, "amount must be greater than 0");
+        if (isRecoveryMode) {
+            _redeemRecovery(amount);
+        } else {
+            _redeemStandard(amount);
+        }
+    }
+
+    /// @dev Standard fixed-price redemption. Burns tokens and pays out at pricePerUnit.
+    ///      Only reachable when isRecoveryMode == false.
+    function _redeemStandard(uint256 amount) internal {
         uint256 payoutAmount = _cost(amount);
         require(paymentToken.balanceOf(address(treasury)) >= payoutAmount, "insufficient liquidity");
 
@@ -150,9 +173,55 @@ contract AssetVault is
         emit Redeemed(msg.sender, amount, payoutAmount);
     }
 
+    /// @dev Pro-rata recovery redemption. Burns tokens and pays out a proportional
+    ///      share of the legal settlement funds deposited in the treasury.
+    ///
+    ///      Payout formula: (amount / totalSupplyBeforeBurn) × treasury.balance()
+    ///
+    ///      This is self-balancing: as investors redeem, both totalSupply and
+    ///      treasury balance decrease proportionally, so every investor gets the
+    ///      same per-token rate regardless of when they redeem. The last investor
+    ///      to burn receives the remaining dust.
+    ///
+    ///      Pre-conditions (enforced off-chain by the platform before calling
+    ///      transitionToRecovery and setRecoveryMode):
+    ///        1. AssetTreasury.deposit() has been called with the recovered amount.
+    ///        2. RWALifecycleModule is in RECOVERY state (burns are allowed by compliance).
+    ///        3. isRecoveryMode has been set to true by the asset admin.
+    ///
+    ///      Only reachable when isRecoveryMode == true.
+    function _redeemRecovery(uint256 amount) internal {
+        uint256 supplyBeforeBurn = token.totalSupply();
+        require(supplyBeforeBurn > 0, 'no token supply');
+
+        uint256 treasuryBalance = paymentToken.balanceOf(address(treasury));
+        require(treasuryBalance > 0, 'no recovery funds in treasury');
+
+        // Pro-rata share: (investor tokens / total supply) x recovery pool
+        uint256 payoutAmount = (amount * treasuryBalance) / supplyBeforeBurn;
+        require(payoutAmount > 0, 'payout rounds to zero');
+
+        token.burn(msg.sender, amount); // compliance module must be in RECOVERY state or this reverts
+        treasury.payout(msg.sender, payoutAmount);
+
+        emit RecoveryRedeemed(msg.sender, amount, payoutAmount);
+    }
+
     // =========================================================================
     // Admin
     // =========================================================================
+
+    /// @dev Activates or deactivates recovery routing for this vault instance.
+    ///      Must be called by the asset admin (DEFAULT_ADMIN_ROLE) atomically alongside
+    ///      RWALifecycleModule.transitionToRecovery() to avoid a race-condition window.
+    ///
+    ///      Effect:
+    ///        true  — redeem() routes to _redeemRecovery() (pro-rata, fixed-price path blocked)
+    ///        false — redeem() routes to _redeemStandard() (normal operation)
+    function setRecoveryMode(bool _status) external onlyRole(DEFAULT_ADMIN_ROLE) {
+        isRecoveryMode = _status;
+        emit RecoveryModeSet(_status);
+    }
 
     function setPrice(uint256 newPrice) external onlyRole(PRICE_ORACLE_ROLE) {
         pricePerUnit = newPrice;
