@@ -102,5 +102,19 @@
     "fundingDeadline": "2026-08-19T12:29:21.000Z",
     "maturityDate": "2027-08-14T12:29:21.000Z",
     "borrower": "0xF8109DA7114395E5d54Ec7041cB0Ffa10E05C4F3"
+  },
+  "CORP-LOAN-010": {
+    "assetId": "0xf8e10eb8115d48034620a468534d302875cb495997d99b5ca146b506aaf97926",
+    "token": "0xc50c6ec8Df8E6ea90D4d409fF715f00c553F57F7",
+    "vault": "0xE05998e183392ff46F411bB7e66dd8f4AF52A924",
+    "treasury": "0xb357a4C29926038efFC8213542CDdC1Ae9DaAb75",
+    "distributor": "0xC34b0103a8f47322236EB24fD1c393De373e97BD",
+    "stateModule": "0x22a8d9633424593dF47CC78a726D0D049665Dfcb",
+    "assetType": "PRIVATE_CREDIT",
+    "targetPrincipalUsdc": "50000",
+    "couponRateBps": 850,
+    "fundingDeadline": "2026-08-20T06:55:47.000Z",
+    "maturityDate": "2027-08-15T06:55:47.000Z",
+    "borrower": "0xF8109DA7114395E5d54Ec7041cB0Ffa10E05C4F3"
   }
 }
